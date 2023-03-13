@@ -277,8 +277,39 @@ require_once ("utils/dataBase.php");
 
         }
 
+       
+
+   
+
+        public static function getAllOrderbyUserId($id){
+            $con = DataBase::connect();
+            $stmt = $con->prepare("SELECT p.ID_PEDIDO, p.PRECIO, pr.NOMBRE, u.NOMBRE,  p.ESTADO_PEDIDO, prp.CANTIDAD, prp.PRECIO
+                                    FROM pedido AS p
+                                    INNER JOIN pedido_producto AS prp
+                                    INNER JOIN producto AS pr
+                                    INNER JOIN usuario AS u 
+                                    ON p.ID_USUARIO = u.ID_USUARIO  AND p.ID_PEDIDO = prp.ID_PEDIDO AND prp.ID_PRODUCTO = pr.ID_PRODUCTO where ID_USUARIO = $id");
+            //Execute statement 
+            $stmt->execute();
+            $result=$stmt->get_result();
+
+            $list = "";
+            while($row = mysqli_fetch_array($result, MYSQLI_BOTH)){
+                $list .= "<tr>";
+                $list .= "<td>".$row['OrdId']."</td>";
+                $list .= "<td>".$row['ProName']."</td>";
+                $list .= "<td>".$row['UseName']."</td>";
+                $list .= "<td>".$row['OrdCreatedDate']."</td>";
+                $list .= "<td>".$row['AddAddress']."</td>";
+                $list .= "<td>".$row['OdeQuantity']."</td>";
+                $list .= "<td>".$row['OdePrice']."€</td>";
+                $list .= "<td>".$row['OrdPaid']."</td>";
+            }
+
+            return $list;
+
+            $con->close();
+
         }
-
-    
-
+    }
 ?>
