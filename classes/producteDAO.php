@@ -283,29 +283,62 @@ require_once ("utils/dataBase.php");
 
         public static function getAllOrderbyUserId($id){
             $con = DataBase::connect();
-            $stmt = $con->prepare("SELECT p.ID_PEDIDO, p.PRECIO, pr.NOMBRE, u.NOMBRE,  p.ESTADO_PEDIDO, prp.CANTIDAD, prp.PRECIO
-                                    FROM pedido AS p
-                                    INNER JOIN pedido_producto AS prp
-                                    INNER JOIN producto AS pr
-                                    INNER JOIN usuario AS u 
-                                    ON p.ID_USUARIO = u.ID_USUARIO  AND p.ID_PEDIDO = prp.ID_PEDIDO AND prp.ID_PRODUCTO = pr.ID_PRODUCTO where ID_USUARIO = $id");
+            $stmt = $con->prepare("SELECT p.ID_PEDIDO, pr.NOMBRE, u.NOMBRE, p.ESTADO_PEDIDO, prp.CANTIDAD, prp.PRECIO , p.PRECIO, p.FECHA_PEDIDO FROM 
+                                    pedido AS p 
+                                    INNER JOIN pedido_producto AS prp 
+                                    INNER JOIN producto AS pr 
+                                    INNER JOIN usuario AS u ON p.ID_USUARIO = u.ID_USUARIO AND p.ID_PEDIDO = prp.ID_PEDIDO AND prp.ID_PRODUCTO = pr.ID_PRODUCTO where p.ID_USUARIO =$id");
             //Execute statement 
             $stmt->execute();
             $result=$stmt->get_result();
 
-            $list = "";
+            $list = "
+            <table class='table bg-color1 text-white center' style='width:65%;'>
+            <tr>
+              <th>Order ID</th>
+              <th>User Name</th>
+              <th>Order Date</th>
+              <th>State of The Order</th>
+              <th>Price</th>
+            </tr>";
             while($row = mysqli_fetch_array($result, MYSQLI_BOTH)){
-                $list .= "<tr>";
-                $list .= "<td>".$row['OrdId']."</td>";
-                $list .= "<td>".$row['ProName']."</td>";
-                $list .= "<td>".$row['UseName']."</td>";
-                $list .= "<td>".$row['OrdCreatedDate']."</td>";
-                $list .= "<td>".$row['AddAddress']."</td>";
-                $list .= "<td>".$row['OdeQuantity']."</td>";
-                $list .= "<td>".$row['OdePrice']."€</td>";
-                $list .= "<td>".$row['OrdPaid']."</td>";
+                $rows[] = $row;
+                while ($a  < count($row)) {
+
+                    $list .= "<tr>";
+                    $list .= "<td>".$rows[$a]['p.ID_PEDIDO']."</td>";
+                    $list .= "<td>".$rows[$a]['u.NOMBRE']."</td>";
+                    $list .= "<td>".$rows[$a]['p.FECHA_PEDIDO']."</td>";
+                    $list .= "<td>".$rows[$a]['p.ESTADO_PEDIDO']."</td>";
+                    $list .= "<td>".$rows[$a]['p.PRECIO']."€</td>";
+    
+                    $list .= "<td>";
+                    $list .= "<tr>";
+                        $list .= "<th>Product Name</th>";
+                        $list .= "<th>Quantity</th>";
+                        $list .= "<th>Price</th>";
+                    $list .= "</tr>";
+                    while ($row['p.ID_PEDIDO'] == $rows[$a]['p.ID_PEDIDO']) {
+                        $list .= "<tr>";
+                        $list .= "<td>".$rows[$a]['pr.NOMBRE']."</td>";
+                        $list .= "<td>".$rows[$a]['prp.CANTIDAD']."</td>";
+                        $list .= "<td>".$rows[$a]['prp.PRECIO']."€</td>";
+                    $list .= "</tr>";
+                    }
+                    
+                    
+                      
+                    $list .= "</td>";
+                $list .= "</tr>";
+
+                $a++;
+                }
             }
 
+
+
+            
+            $list .= "</tr>";
             return $list;
 
             $con->close();

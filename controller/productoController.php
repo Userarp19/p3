@@ -440,6 +440,24 @@ public function saveOrder(){
   require_once("utils/saveOrder.php");
   
 }
+public function showOrder(){
+  
+  
+  
+  require("utils/protection.php");
+  if(isset($_SESSION['compra'])){
+    $orderCounts = count($_SESSION['compra']);
+  }else{
+    $orderCounts = '';
+  }
+  
+  require_once ("classes/producteDAO.php");
+ 
+  include ("views/includes/header.php");
+  require_once("views/showOrderOrder.php");
+  include ("views/includes/footer.php");
+  
+}
 }
 
 
